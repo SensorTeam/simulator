@@ -29,7 +29,7 @@ class Simulator:
 		cv.circle(
 			self.image,
 			coord_left,
-			size,
+			size - 1,
 			(255,255,255),
 			thickness=-1
 		)
@@ -50,7 +50,7 @@ class Simulator:
 		cv.circle(
 			self.image,
 			coord_right,
-			size,
+			size - 1,
 			(255,255,255),
 			thickness=-1
 		)
