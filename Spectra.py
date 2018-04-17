@@ -18,7 +18,21 @@ class Spectra:
 			self.spectra[i] = 0.5
 		return self.spectra
 
-	def random(self):
-		for i in range(self.size):
-			self.spectra[i] = uniform(0,1)
+	def random(self, chunks=3):
+		for j in range(chunks):
+			start = 0
+			end = self.size
+			a = int(uniform(0,1) * self.size)
+			b = int(uniform(0,1) * self.size)
+
+			if b > a:
+				start = a
+				end = b
+			else:
+				start = b
+				end = a 
+			for i in range(start, end):
+				self.spectra[i] = uniform(0.5,1.0)
+
 		return self.spectra
+
