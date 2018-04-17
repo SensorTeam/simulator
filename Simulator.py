@@ -114,18 +114,26 @@ class Simulator:
 		self.image = cv.GaussianBlur(self.image, (11,33), 0)
 
 		for i in range(start, end):
+			count = i - start
+			value = self.spectra[int((count/length) * 100)]
+			rgb = cs.hsv_to_rgb(count/length, 0, value)
+			bgr = (
+				int(rgb[2] * 255),
+				int(rgb[1] * 255),
+				int(rgb[0] * 255),
+			)
 			cv.circle(
 				self.image,
 				(self.eye_coord_left[0], i),
 				self.eye_size - 3,
-				(255,255,255),
+				bgr,
 				thickness=-1
 			)
 			cv.circle(
 				self.image,
 				(self.eye_coord_right[0], i),
 				self.eye_size - 3,
-				(255,255,255),
+				bgr,
 				thickness=-1
 			)
 

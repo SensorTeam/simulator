@@ -2,7 +2,7 @@ from Spectra import *
 from Simulator import *
 
 cat_eyes = Simulator(320, 180, 16)
-cat_spectra = Spectra().generate()
+cat_spectra = Spectra().full()
 
 cat_eyes.draw(
 	5,
