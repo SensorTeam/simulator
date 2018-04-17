@@ -1,11 +1,14 @@
+from Spectra import *
 from Simulator import *
 
-cat = Simulator(320, 180, 16)
+cat_eyes = Simulator(320, 180, 16)
+cat_spectra = Spectra().generate()
 
-cat.draw(
+cat_eyes.draw(
 	5,
 	16,
-	(0,255,0)
+	(255,255,255),
+	cat_spectra
 )
 
-cat.save('output.jpg')
+cat_eyes.save('output.jpg')

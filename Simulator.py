@@ -13,6 +13,8 @@ class Simulator:
 			3
 		), np.uint8)
 
+		self.spectra = None
+
 		self.eye_size = None
 		self.eye_span = None
 		self.eye_color = None
@@ -57,9 +59,12 @@ class Simulator:
 	def _spectra(self):
 		start = 0 + self.margin
 		end = self.height - (2 * self.margin) - (2 * self.eye_size)
+		length = (end - start)
 
 		for i in range(start, end):
-			rgb = cs.hsv_to_rgb(i/(end - start), 1, 1)
+			count = i - start
+			value = self.spectra[int((count/length) * 100)]
+			rgb = cs.hsv_to_rgb(count/length, 1, value)
 			bgr = (
 				int(rgb[2] * 255),
 				int(rgb[1] * 255),
@@ -83,7 +88,9 @@ class Simulator:
 		self.image = cv.GaussianBlur(self.image, (55,99), 0)
 
 		for i in range(start, end):
-			rgb = cs.hsv_to_rgb(i/(end - start), 1, 1)
+			count = i - start
+			value = self.spectra[int((count/length) * 100)]
+			rgb = cs.hsv_to_rgb(count/length, 1, value)
 			bgr = (
 				int(rgb[2] * 255),
 				int(rgb[1] * 255),
@@ -124,7 +131,8 @@ class Simulator:
 
 		self.image = cv.GaussianBlur(self.image, (7,7), 0)
 
-	def draw(self, size, span, color):
+	def draw(self, size, span, color, spectra):
+		self.spectra = spectra
 		self.eye_size = size
 		self.eye_span = span
 		self.eye_color = color
