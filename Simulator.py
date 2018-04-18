@@ -43,7 +43,7 @@ class Simulator:
 
 		self.__render_spectra()
 		self.__render_eyes()
-		self.__render_blur()
+		# self.__render_blur()
 		self.__export()
 
 	def __set_params(self, parameters):
@@ -77,46 +77,19 @@ class Simulator:
 				int(rgb[1] * 255),
 				int(rgb[0] * 255),
 			)
-			cv.circle(
+			cv.line(
 				self.__image,
-				(self.__coord_left[0], i),
-				int(self.__pupil_size/2),
+				(self.__coord_left[0] - self.__pupil_size, i),
+				(self.__coord_left[0] + self.__pupil_size, i),
 				bgr,
-				thickness=-1
+				1
 			)
-			cv.circle(
+			cv.line(
 				self.__image,
-				(self.__coord_right[0], i),
-				int(self.__pupil_size/2),
+				(self.__coord_right[0] - self.__pupil_size, i),
+				(self.__coord_right[0] + self.__pupil_size, i),
 				bgr,
-				thickness=-1
-			)
-
-		# Draw intensity peaks
-		for i in range(start, end):
-			count = i - start
-			fraction = count/length
-			index = int(len(self.__spectrum.data) * fraction)
-			value = self.__spectrum.data[index][1]
-			rgb = cs.hsv_to_rgb(count/length, 0, value)
-			bgr = (
-				int(rgb[2] * 255),
-				int(rgb[1] * 255),
-				int(rgb[0] * 255),
-			)
-			cv.circle(
-				self.__image,
-				(self.__coord_left[0], i),
-				int(self.__pupil_size/4),
-				bgr,
-				thickness=-1
-			)
-			cv.circle(
-				self.__image,
-				(self.__coord_right[0], i),
-				int(self.__pupil_size/4),
-				bgr,
-				thickness=-1
+				1
 			)
 
 	def __render_eyes(self):
