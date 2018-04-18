@@ -43,7 +43,6 @@ class Simulator:
 
 		self.__render_spectra()
 		self.__render_eyes()
-		# self.__render_blur()
 		self.__export()
 
 	def __set_params(self, parameters):
@@ -108,13 +107,6 @@ class Simulator:
 			color,
 			thickness=-1
 		)
-		cv.circle(
-			self.__image,
-			self.__coord_left,
-			self.__pupil_size - 1,
-			(255,255,255),
-			thickness=-1
-		)
 
 		# Draw right eye
 		cv.circle(
@@ -124,26 +116,6 @@ class Simulator:
 			color,
 			thickness=-1
 		)
-		cv.circle(
-			self.__image,
-			self.__coord_right,
-			self.__pupil_size - 1,
-			(255,255,255),
-			thickness=-1
-		)
-
-	def __render_blur(self):
-		# Blurs the drawing according to parameters
-
-		# Blur eyes
-		y = self.__image_height - (2 * self.__image_margin)
-		y_h = self.__image_height
-		x = self.__coord_left[0] - self.__pupil_size - self.__image_margin
-		x_h = self.__coord_right[0] + self.__pupil_size + self.__image_margin
-		self.__image[y:y_h, x:x_h] = cv.GaussianBlur(self.__image[y:y_h, x:x_h], (7,7), 0)
-
-		# Blur spectra
-		self.__image[0:y, 0:-1] = cv.GaussianBlur(self.__image[0:y, 0:-1], (7,11), 0)
 
 	def __export(self):
 		# Writes output to an image file
