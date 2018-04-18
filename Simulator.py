@@ -3,67 +3,74 @@ import numpy as np
 import colorsys as cs
 
 class Simulator:
-	def __init__(self, width, height, margin):
-		self.width = width
-		self.height = height
-		self.margin = margin
-		self.image = np.zeros((
-			height,
-			width,
+	def __init__(self):
+		# Initialises the Simulator object
+		self.__image_filename = None
+		self.__image_margin = None
+		self.__image_height = None
+		self.__image_width = None
+
+		self.__pupil_distance_inter = None
+		self.__pupil_distance = None
+		self.__pupil_size = None
+
+		self.__coord_right = None
+		self.__coord_left = None
+
+		self.__spectrum = None
+
+		self.__output = None
+		self.__image = None
+
+	def render(self, parameters):
+		# Main render method
+		self.__set_params(parameters)
+
+		self.__image = np.zeros((
+			self.__image_height,
+			self.__image_width,
 			3
 		), np.uint8)
 
-		self.spectra = None
-
-		self.eye_size = None
-		self.eye_span = None
-		self.eye_color = None
-		self.eye_coord_left = None
-		self.eye_coord_right = None
-
-	def _eyes(self):
-		cv.circle(
-			self.image,
-			self.eye_coord_left,
-			self.eye_size,
-			self.eye_color,
-			thickness=-1
+		self.__coord_left = (
+			(self.__image_width // 2) - (self.__pupil_distance_inter // 2),
+			self.__image_height - self.__pupil_size - self.__image_margin
+		)
+		self.__coord_right = (
+			(self.__image_width // 2) + (self.__pupil_distance_inter // 2),
+			self.__image_height - self.__pupil_size - self.__image_margin
 		)
 
-		cv.circle(
-			self.image,
-			self.eye_coord_left,
-			self.eye_size - 1,
-			(255,255,255),
-			thickness=-1
-		)
+		self.__render_spectra()
+		self.__render_eyes()
+		self.__render_blur()
+		self.__export()
 
-		cv.circle(
-			self.image,
-			self.eye_coord_right,
-			self.eye_size,
-			self.eye_color,
-			thickness=-1
-		)
+	def __set_params(self, parameters):
+		# Sets simulation parameters
+		self.__image_filename = parameters['image-filename']
+		self.__image_margin = parameters['image-margin']
+		self.__image_height = parameters['image-height']
+		self.__image_width = parameters['image-width']
 
-		cv.circle(
-			self.image,
-			self.eye_coord_right,
-			self.eye_size - 1,
-			(255,255,255),
-			thickness=-1
-		)
+		self.__pupil_distance_inter = parameters['pupil-distance-inter']
+		self.__pupil_distance = parameters['pupil-distance']
+		self.__pupil_size = parameters['pupil-size']
 
-		self.image = cv.GaussianBlur(self.image, (7,7), 0)
+		self.__spectrum = parameters['spectrum']
 
-	def _spectra(self):
-		start = 0 + self.margin
-		end = self.height - (2 * self.margin) - (2 * self.eye_size)
+	def __render_spectra(self):
+		# Draws the spectrum
+		start = self.__image_margin
+		end = self.__image_height - (2 * self.__image_margin) - (2 * self.__pupil_size)
 		length = (end - start)
 
+		# Draw rainbow according to input spectrum
 		for i in range(start, end):
 			count = i - start
-			value = self.spectra[int((count/length) * 100)]
+			fraction = count/length
+			index = int(len(self.__spectrum.data) * fraction)
+			value = self.__spectrum.data[index][1]
 			rgb = cs.hsv_to_rgb(count/length, 1, value)
 			bgr = (
 				int(rgb[2] * 255),
@@ -71,51 +78,26 @@ class Simulator:
 				int(rgb[0] * 255),
 			)
 			cv.circle(
-				self.image,
-				(self.eye_coord_left[0], i),
-				self.eye_size - 1,
+				self.__image,
+				(self.__coord_left[0], i),
+				int(self.__pupil_size/2),
 				bgr,
 				thickness=-1
 			)
 			cv.circle(
-				self.image,
-				(self.eye_coord_right[0], i),
-				self.eye_size - 1,
+				self.__image,
+				(self.__coord_right[0], i),
+				int(self.__pupil_size/2),
 				bgr,
 				thickness=-1
 			)
 
-		self.image = cv.GaussianBlur(self.image, (55,99), 0)
-
+		# Draw intensity peaks
 		for i in range(start, end):
 			count = i - start
-			value = self.spectra[int((count/length) * 100)]
-			rgb = cs.hsv_to_rgb(count/length, 1, value)
-			bgr = (
-				int(rgb[2] * 255),
-				int(rgb[1] * 255),
-				int(rgb[0] * 255),
-			)
-			cv.circle(
-				self.image,
-				(self.eye_coord_left[0], i),
-				self.eye_size - 1,
-				bgr,
-				thickness=-1
-			)
-			cv.circle(
-				self.image,
-				(self.eye_coord_right[0], i),
-				self.eye_size - 1,
-				bgr,
-				thickness=-1
-			)
-
-		self.image = cv.GaussianBlur(self.image, (11,33), 0)
-
-		for i in range(start, end):
-			count = i - start
-			value = self.spectra[int((count/length) * 100)]
+			fraction = count/length
+			index = int(len(self.__spectrum.data) * fraction)
+			value = self.__spectrum.data[index][1]
 			rgb = cs.hsv_to_rgb(count/length, 0, value)
 			bgr = (
 				int(rgb[2] * 255),
@@ -123,41 +105,73 @@ class Simulator:
 				int(rgb[0] * 255),
 			)
 			cv.circle(
-				self.image,
-				(self.eye_coord_left[0], i),
-				self.eye_size - 3,
+				self.__image,
+				(self.__coord_left[0], i),
+				int(self.__pupil_size/4),
 				bgr,
 				thickness=-1
 			)
 			cv.circle(
-				self.image,
-				(self.eye_coord_right[0], i),
-				self.eye_size - 3,
+				self.__image,
+				(self.__coord_right[0], i),
+				int(self.__pupil_size/4),
 				bgr,
 				thickness=-1
 			)
 
-		self.image = cv.GaussianBlur(self.image, (7,7), 0)
-
-	def draw(self, size, span, color, spectra):
-		self.spectra = spectra
-		self.eye_size = size
-		self.eye_span = span
-		self.eye_color = color
-		self.eye_coord_left = (
-			(self.width // 2) - (span // 2),
-			self.height - self.eye_size - self.margin
-		)
-		self.eye_coord_right = (
-			(self.width // 2) + (span // 2),
-			self.height - self.eye_size - self.margin
+	def __render_eyes(self):
+		# Draws the eyes
+		color = (
+			int(self.__spectrum.rgb[2] * 255),
+			int(self.__spectrum.rgb[1] * 255),
+			int(self.__spectrum.rgb[0] * 255),
 		)
 
-		self._spectra()
-		self._eyes()
+		# Draw left eye
+		cv.circle(
+			self.__image,
+			self.__coord_left,
+			self.__pupil_size,
+			color,
+			thickness=-1
+		)
+		cv.circle(
+			self.__image,
+			self.__coord_left,
+			self.__pupil_size - 1,
+			(255,255,255),
+			thickness=-1
+		)
 
-	def blur(self, amount):
-		self.image = cv.GaussianBlur(self.image, (amount,amount), 0)
+		# Draw right eye
+		cv.circle(
+			self.__image,
+			self.__coord_right,
+			self.__pupil_size,
+			color,
+			thickness=-1
+		)
+		cv.circle(
+			self.__image,
+			self.__coord_right,
+			self.__pupil_size - 1,
+			(255,255,255),
+			thickness=-1
+		)
 
-	def save(self, filename):
-		cv.imwrite(filename, self.image)
+	def __render_blur(self):
+		# Blurs the drawing according to parameters
+
+		# Blur eyes
+		y = self.__image_height - (2 * self.__image_margin)
+		y_h = self.__image_height
+		x = self.__coord_left[0] - self.__pupil_size - self.__image_margin
+		x_h = self.__coord_right[0] + self.__pupil_size + self.__image_margin
+		self.__image[y:y_h, x:x_h] = cv.GaussianBlur(self.__image[y:y_h, x:x_h], (7,7), 0)
+
+		# Blur spectra
+		self.__image[0:y, 0:-1] = cv.GaussianBlur(self.__image[0:y, 0:-1], (7,11), 0)
+
+	def __export(self):
+		# Writes output to an image file
+		cv.imwrite(self.__image_filename, self.__image)

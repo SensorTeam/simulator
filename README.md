@@ -1,4 +1,6 @@
-# NAE Data Simulator
+# Simulator
+
+Simulates generating photos of eye-shine and corresponding spectral data
 
 ## Requirements
 
@@ -6,9 +8,13 @@
 * `pip`
 * `virtualenv`
 
+## Setup
+
+1. Clone this repo
+2. Setup `virtualenv -p python3 venv`
+3. Activate `source venv/bin/activate`
+4. Install package dependencies with `pip install -r requirements.txt`
+
 ## Usage
 
-1. Setup a virtual environment using the command `virtualenv venv`
-2. Activate the virtual environment using `source venv/bin/activate`
-3. Install package dependencies using `pip install -r requirements.txt`
-4. Run the program using `python main.py`
+Run `main.py`!
