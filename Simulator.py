@@ -18,7 +18,7 @@ class Simulator:
 		self.__render_blur()
 		self.__export()
 
-	def __set_params(parameters):
+	def __set_params(self, parameters):
 		# Sets simulation parameters
 		self.__pupil_distance_inter = parameters['pupil-distance-inter']
 		self.__pupil_distance = parameters['pupil-distance']
@@ -27,6 +27,7 @@ class Simulator:
 
 	def __render_spectra(self):
 		# Draws the spectrum
+		pass
 
 	def __render_eyes(self):
 		# Draws the eyes
