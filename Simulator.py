@@ -1,3 +1,4 @@
+import math
 import cv2 as cv
 import numpy as np
 import colorsys as cs
@@ -70,7 +71,8 @@ class Simulator:
 			fraction = count/length
 			index = int(len(self.__spectrum.data) * fraction)
 			value = self.__spectrum.data[index][1]
-			rgb = cs.hsv_to_rgb(count/length, 1, value)
+			hue = -(fraction * (270/360)) + (270/360)
+			rgb = cs.hsv_to_rgb(hue, 1, value)
 			bgr = (
 				int(rgb[2] * 255),
 				int(rgb[1] * 255),
@@ -92,30 +94,41 @@ class Simulator:
 			)
 
 	def __render_eyes(self):
-		# Draws the eyes
-		color = (
-			int(self.__spectrum.rgb[2] * 255),
-			int(self.__spectrum.rgb[1] * 255),
-			int(self.__spectrum.rgb[0] * 255),
-		)
+		# Draws eyes
+		color = self.__spectrum.rgb
+		for i in range(self.__pupil_size, 1, -1):
+			# Find light intensity
+			s = self.__intensity(i/self.__pupil_size)
+			hsv = cs.rgb_to_hsv(color[0], color[1], color[2])
+			rgb = cs.hsv_to_rgb(hsv[0], 1 - s, hsv[2])
+			bgr = (
+				int(rgb[2] * 255),
+				int(rgb[1] * 255),
+				int(rgb[0] * 255),
+			)
 
-		# Draw left eye
-		cv.circle(
-			self.__image,
-			self.__coord_left,
-			self.__pupil_size,
-			color,
-			thickness=-1
-		)
+			# Draw left eye
+			cv.circle(
+				self.__image,
+				self.__coord_left,
+				i,
+				bgr,
+				thickness=-1
+			)
 
-		# Draw right eye
-		cv.circle(
-			self.__image,
-			self.__coord_right,
-			self.__pupil_size,
-			color,
-			thickness=-1
-		)
+			# Draw right eye
+			cv.circle(
+				self.__image,
+				self.__coord_right,
+				i,
+				bgr,
+				thickness=-1
+			)
+
+	def __intensity(self, x):
+		# Simplified Gaussian function for color intensity
+		exponent = -(x ** 2)
+		return math.exp(exponent)
 
 	def __export(self):
 		# Writes output to an image file

@@ -579,7 +579,13 @@ class Spectrum:
 	def __render__color(self):
 		# Converts current spectrum into an RGB color
 		xyz = self.__util__spectrum_to_xyz(self.data)
-		return np.dot(self.__matrix_rgb_from_xyz, xyz)
+		rgb = np.dot(self.__matrix_rgb_from_xyz, xyz)
+		for i in range(len(rgb)):
+			if rgb[i] < 0:
+				rgb[i] = 0.0
+			if rgb[i] > 1:
+				rgb[i] = 1.0
+		return rgb
 
 	def update(self, data):
 		# Update function to modify the existing spectrum
