@@ -1,4 +1,3 @@
-import numpy as np
 from random import uniform
 from Spectrum import Spectrum
 from Simulator import Simulator

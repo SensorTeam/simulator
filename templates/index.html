@@ -1,0 +1,29 @@
+<!doctype html>
+<html>
+	<title>NAE Data Generator</title>
+	<meta charset="utf-8"/>
+	<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}"/>
+
+	<body>
+		<div class="controller">
+			<form action="/submit" method="POST" class="form">
+				<div class="field">
+					<div class="label">Inter-Pupillary Distance</div>
+					<input type="text" name='pupil-distance-inter' class="input"/>
+				</div>
+				<div class="field">
+					<div class="label">Pupil Distance</div>
+					<input type="text" name='pupil-distance' class="input"/>
+				</div>
+				<div class="field">
+					<div class="label">Pupil Size</div>
+					<input type="text" name='pupil-size' class="input"/>
+				</div>
+				<input type="submit" value="Generate"/>
+			</form>
+		</div>
+		<div class="output">
+			<img src="{{ url_for('static', filename='output.jpg') }}"/>
+		</div>
+	</body>
+</html>
